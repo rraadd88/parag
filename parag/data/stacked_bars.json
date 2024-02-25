@@ -1,0 +1,151 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "padding": 5,
+  "width": 720,
+  "height": 720,
+  "signals": [
+    {
+      "name": "startAngle",
+      "value": 0,
+      "bind": {"input": "range", "min": -3.14, "max": 3.14, "step": 0.01}
+    },
+    {
+      "name": "endAngle",
+      "value": 6.28,
+      "bind": {"input": "range", "min": 3.14, "max": 6.28, "step": 0.01}
+    },
+    {
+      "name": "innerRadius",
+      "value": 170,
+      "bind": {"input": "range", "min": 0, "max": 500, "step": 5}
+    },
+    {
+      "name": "outerRadius",
+      "value": 200,
+      "bind": {"input": "range", "min": 0, "max": 500, "step": 5}
+    },
+    {
+      "name": "innerPadding",
+      "value": 0.15,
+      "bind": {"input": "range", "min": 0, "max": 1}
+    },
+    {
+      "name": "cornerRadius",
+      "value": 0,
+      "bind": {"input": "range", "min": 0, "max": 10, "step": 0.5}
+    }
+  ],
+  "data": [
+    {
+      "name": "degrees",
+      "values": [
+        {
+          "source": "AAACGCACCTATGG-7",
+          "CD4+/CD25 T Reg": 4,
+          "CD4+/CD45RA+/CD25- Naive T": 1,
+          "CD4+/CD45RO+ Memory": 2,
+          "CD8+ Cytotoxic T": 2,
+          "CD8+/CD45RA+ Naive Cytotoxic": 2,
+          "CD14+ Monocyte": 0,
+          "CD19+ B": 0,
+          "CD34+": 0,
+          "CD56+ NK": 0,
+          "Dendritic": 0
+        },
+        {
+          "source": "AAGTCCGACCACCT-4",
+          "CD4+/CD25 T Reg": 3,
+          "CD4+/CD45RA+/CD25- Naive T": 2,
+          "CD4+/CD45RO+ Memory": 1,
+          "CD8+ Cytotoxic T": 0,
+          "CD8+/CD45RA+ Naive Cytotoxic": 0,
+          "CD14+ Monocyte": 2,
+          "CD19+ B": 0,
+          "CD34+": 0,
+          "CD56+ NK": 0,
+          "Dendritic": 0
+        },
+        {
+          "source": "AATCTCACGTTGGT-4",
+          "CD4+/CD25 T Reg": 2,
+          "CD4+/CD45RA+/CD25- Naive T": 2,
+          "CD4+/CD45RO+ Memory": 6,
+          "CD8+ Cytotoxic T": 1,
+          "CD8+/CD45RA+ Naive Cytotoxic": 0,
+          "CD14+ Monocyte": 0,
+          "CD19+ B": 0,
+          "CD34+": 0,
+          "CD56+ NK": 4,
+          "Dendritic": 0
+        }
+      ],
+      "transform": [
+        {
+          "type": "fold",
+          "fields": [
+            "CD4+/CD45RO+ Memory",
+            "CD4+/CD25 T Reg",
+            "CD4+/CD45RA+/CD25- Naive T"
+          ]
+        },
+        {
+          "type": "formula",
+          "as": "c",
+          "initonly": true,
+          "expr": "if(datum.key==='CD4+/CD45RO+ Memory','green',if(datum.key==='CD4+/CD25 T Reg','#f0f','red'))"
+        },
+        {
+          "type": "stack",
+          "groupby": ["source"],
+          "field": "value",
+          "as": ["r0", "r1"]
+        }
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "chbands",
+      "type": "band",
+      "paddingInner": {"signal": "innerPadding"},
+      "range": [{"signal": "startAngle"}, {"signal": "endAngle"}],
+      "domain": {"data": "degrees", "field": "source"}
+    },
+    {
+      "name": "angle",
+      "type": "linear",
+      "range": [{"signal": "innerRadius"}, {"signal": "outerRadius"}],
+      "nice": true,
+      "domain": {"data": "degrees", "field": "r1"}
+    }
+  ],
+  "marks": [
+    {
+      "type": "arc",
+      "from": {"data": "degrees"},
+      "encode": {
+        "enter": {
+          "padAngle": 0,
+          "x": {"signal": "width / 2"},
+          "y": {"signal": "height / 2"}
+        },
+        "update": {
+          "fill": {"field": "c"},
+          "startAngle": {"scale": "chbands", "field": "source"},
+          "endAngle": {
+            "scale": "chbands",
+            "field": "source",
+            "offset": {"scale": "chbands", "band": 1}
+          },
+          "innerRadius": {"scale": "angle", "field": "r0"},
+          "outerRadius": {"scale": "angle", "field": "r1"},
+          "cornerRadius": {"signal": "cornerRadius"},
+		  "tooltip": {
+              "signal": "{'degree': format(datum.value * 100, '.0f')+'%','subset': datum.key,'node': datum.source}"
+          }            
+        }
+      }
+    }
+  ],
+  "config": {}
+}
