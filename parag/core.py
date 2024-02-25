@@ -4,6 +4,9 @@
 __all__ = ['get_net_data']
 
 # %% ../01_data.ipynb 3
+## helper functions
+import roux.lib.df as rd #noqa
+
 def get_net_data(
     adata,
     n: int = 5,  # number of nodes per subset/group
@@ -19,6 +22,7 @@ def get_net_data(
     """
     import logging
     import pandas as pd
+    import roux.lib.df as rd
 
     ## nodes
     logging.info("processing nodes:")
@@ -29,7 +33,7 @@ def get_net_data(
         ],
         axis=1,
     )
-    if n is not None:
+    if not n is None:
         df1 = (
             df01.log()
             .groupby("bulk_labels", as_index=False, observed=False)

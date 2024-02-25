@@ -8,12 +8,15 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 import pandas as pd
-from roux.lib.io import read_dict, to_dict
+from roux.lib.io import read_dict, to_dict, read_ps, read_table, to_table
 import roux.lib.df as rd  # noqa
 
+from IPython.display import display
+import pandas as pd
 
+## helper functions
+import roux.lib.df as rd #noqa
 from roux.lib.str import linebreaker
-
 
 def center_subset_label(
     ds1: pd.Series,
@@ -102,7 +105,7 @@ def get_preprocessed(
             }
         )
     )
-    if testn is not None:
+    if not testn is None:
         df1 = df1.head(testn)
         logging.warning(f"testing {testn} nodes")
     if verbose:
@@ -327,7 +330,7 @@ def to_net(
         # _col_node_name=_col_node_id
     if col_subset_name is None:
         col_subset_name = col_subset_id
-    if nodes_path is not None and edges_path is not None:
+    if not nodes_path is None and not edges_path is None:
         df1 = pd.DataFrame(read_dict(nodes_path))
         df2 = pd.DataFrame(read_dict(edges_path))
     else:

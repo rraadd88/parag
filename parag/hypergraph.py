@@ -8,6 +8,8 @@ import logging
 import pandas as pd
 from roux.lib.io import read_dict
 
+import roux.lib.df as rd #noqa
+
 def get_degreeby_subset(
     nodes: pd.DataFrame,
     edges: pd.DataFrame,
@@ -102,7 +104,7 @@ def plot_degreeby_subset(
         col_target=col_target,
         col_subset_id=col_subset_id,
     )
-    if order is not None:
+    if not order is None:
         degreebysubset = degreebysubset.set_index("source").loc[order, :].reset_index()
     # degreebysubset.head(1)
 
@@ -119,6 +121,7 @@ def plot_degreeby_subset(
     #     import seaborn as sns # for the matching color palette
     #     cmap_subsets=sns.color_palette("colorblind")
 
+    from roux.viz.colors import get_ncolors
 
     if hue_order is None:
         subsets = degreebysubset.set_index("source").columns.tolist()

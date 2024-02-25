@@ -64,7 +64,7 @@ def display_plot(
         method (str, optional): method. Defaults to 'vega'.
     """
 
-    if defaults is not None:
+    if not defaults is None:
         spec = _set_defaults(
             spec,
             defaults,
