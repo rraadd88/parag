@@ -17,7 +17,7 @@ class="quarto-discovered-preview-image" alt="build" />](https://github.com/rraad
 <a href="">[![Downloads](https://img.shields.io/pypi/dm/parag?style=for-the-badge.png)](https://pepy.tech/project/parag)</a>
 <a href="">[![GNU
 License](https://img.shields.io/github/license/rraadd88/parag.svg?style=for-the-badge)](https://github.com/rraadd88/parag/blob/master/LICENSE)</a>
-<a href="">[![DOI](https://img.shields.io/badge/DOI-zenodo-blue?style=for-the-badge.png)](https://doi.org//zenodo.)</a>
+<a href="">[![DOI](https://img.shields.io/badge/DOI-zenodo-blue?style=for-the-badge.png)](https://doi.org/10.5281/zenodo.10703097)</a>
 
 ## Install
 
@@ -364,17 +364,17 @@ cfg,df_=to_net(
       title   = {parag: interactive visualization of higher-order graphs in Python},
       author  = {Dandage, Rohan},
       year    = {2024},
-      url     = {https://doi.org//zenodo.},
+      url     = {https://doi.org/10.5281/zenodo.10703097},
       version = {v0.0.1},
       note    = {The URL is a DOI link to the permanent archive of the software.},
     }
 
 2.  DOI link:
-    [![DOI](https://zenodo.org/badge/DOI//zenodo..svg)](https://doi.org//zenodo.),
+    [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10703097.svg)](https://doi.org/10.5281/zenodo.10703097),
     or
 
 3.  Using citation information from [CITATION.CFF
-    file](https://github.com/rraadd88/parag/blob/main/CITATION.cff).
+    file](https://github.com/rraadd88/parag/blob/master/CITATION.cff).
 
 ## Future directions, for which contributions are welcome
 
