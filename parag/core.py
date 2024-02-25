@@ -19,7 +19,6 @@ def get_net_data(
     """
     import logging
     import pandas as pd
-    import roux.lib.df as rd
 
     ## nodes
     logging.info("processing nodes:")
@@ -30,7 +29,7 @@ def get_net_data(
         ],
         axis=1,
     )
-    if not n is None:
+    if n is not None:
         df1 = (
             df01.log()
             .groupby("bulk_labels", as_index=False, observed=False)
