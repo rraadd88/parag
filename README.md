@@ -10,14 +10,11 @@ higher-order graphs in Python
 [![Stargazers][stars-shield]][stars-url] -->
 <!-- <a href="">[![PyPI](https://img.shields.io/pypi/v/parag?style=for-the-badge)![Python](https://img.shields.io/pypi/pyversions/parag?style=for-the-badge)](https://pypi.org/project/parag)</a> -->
 
-<a href="">[<img
-src="https://img.shields.io/github/actions/workflow/status/rraadd88/beditor/build.yml?style=for-the-badge"
-class="quarto-discovered-preview-image" alt="build" />](https://github.com/rraadd88/parag/actions/workflows/build.yml)</a>
+![GitHub Repo stars](https://img.shields.io/github/stars/rraadd88/parag?style=for-the-badge)
+<a href="">[![Downloads](https://img.shields.io/pypi/dm/parag?style=for-the-badge)](https://pepy.tech/project/parag)</a>
+<a href="">[![GNU License](https://img.shields.io/github/license/rraadd88/parag.svg?style=for-the-badge)](https://github.com/rraadd88/parag/blob/master/LICENSE)</a>
 <a href="">[![Issues](https://img.shields.io/github/issues/rraadd88/parag.svg?style=for-the-badge)](https://github.com/rraadd88/parag/issues)</a>
-<a href="">[![Downloads](https://img.shields.io/pypi/dm/parag?style=for-the-badge.png)](https://pepy.tech/project/parag)</a>
-<a href="">[![GNU
-License](https://img.shields.io/github/license/rraadd88/parag.svg?style=for-the-badge)](https://github.com/rraadd88/parag/blob/master/LICENSE)</a>
-<a href="">[![DOI](https://img.shields.io/badge/DOI-zenodo-blue?style=for-the-badge.png)](https://doi.org/10.5281/zenodo.10703097)</a>
+<!-- <a href="">[![build](https://img.shields.io/github/actions/workflow/status/rraadd88/dseq/test.yaml?style=for-the-badge)](https://github.com/rraadd88/parag/actions/workflows/test.yaml)</a> -->
 
 ## Install
 
