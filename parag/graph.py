@@ -8,13 +8,12 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 import pandas as pd
-from roux.lib.io import read_dict, to_dict
-import roux.lib.df as rd  # noqa
-
 
 ## helper functions
-import roux.lib.df as rd #noqa
+import roux.lib.df as rd  # noqa  #noqa
+from roux.lib.io import read_dict, to_dict
 from roux.lib.str import linebreaker
+
 
 def center_subset_label(
     ds1: pd.Series,
@@ -367,14 +366,14 @@ def to_net(
     if verbose:
         print(to_subset_color)
     d1["marks"][0]["encode"]["update"]["fill"] = [
-        {"test": f"datum.id === {str(int(k))}", "value": v}
+        {"test": f"datum.id === {int(k)!s}", "value": v}
         for k, v in df1.set_index(_col_node_id)[col_subset_id]
         .map(to_subset_color)
         .to_dict()
         .items()
     ] + d1["marks"][0]["encode"]["update"]["fill"]
     d1["marks"][1]["encode"]["update"]["fill"] = [
-        {"test": f"datum.id === {str(int(k))}", "value": v}
+        {"test": f"datum.id === {int(k)!s}", "value": v}
         for k, v in df1.set_index(_col_node_id)[col_subset_id]
         .map(to_subset_color)
         .to_dict()

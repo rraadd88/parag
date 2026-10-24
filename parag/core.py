@@ -21,6 +21,7 @@ def get_net_data(
         tuple: nodes, edges
     """
     import logging
+
     import pandas as pd
 
     ## nodes

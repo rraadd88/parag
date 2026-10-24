@@ -5,10 +5,11 @@ __all__ = ['get_degreeby_subset', 'plot_degreeby_subset', 'to_net']
 
 # %% ../03_hypergraph.ipynb 3
 import logging
+
 import pandas as pd
+import roux.lib.df as rd  #noqa
 from roux.lib.io import read_dict
 
-import roux.lib.df as rd #noqa
 
 def get_degreeby_subset(
     nodes: pd.DataFrame,
@@ -39,11 +40,9 @@ def get_degreeby_subset(
         nodes.loc[:, [col_node_id]]
         .rename(columns={col_node_id: "source"})
         .assign(
-            **{
-                "target": lambda df: df["source"].apply(
+            target=lambda df: df["source"].apply(
                     lambda x: list(G.neighbors(x)) if x in G.nodes else None
                 )
-            }
         )
         .explode("target")
         .log.dropna()
