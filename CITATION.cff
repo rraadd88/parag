@@ -12,3 +12,46 @@ identifiers:
 repository-code: https://github.com/rraadd88/parag
 version: v0.0.1
 date-released: '2024-02-25'
+references:
+- type: data
+  title: 'BioSNAP Datasets: Stanford Biomedical Network Dataset Collection'
+  authors:
+  - given-names: Marinka
+    family-names: Zitnik
+  - given-names: Rok
+    family-names: Sosič
+  - given-names: Sagar
+    family-names: Maheshwari
+  - given-names: Jure
+    family-names: Leskovec
+  year: 2018
+  url: https://snap.stanford.edu/biodata
+- type: article
+  title: Predicting multicellular function through multi-layer tissue networks
+  authors:
+  - given-names: Marinka
+    family-names: Zitnik
+  - given-names: Jure
+    family-names: Leskovec
+  journal: Bioinformatics
+  volume: 33
+  issue: 14
+  start: i190
+  end: i198
+  year: 2017
+- type: article
+  title: Modeling polypharmacy side effects with graph convolutional networks
+  authors:
+  - given-names: Marinka
+    family-names: Zitnik
+  - given-names: Monica
+    family-names: Agrawal
+  - given-names: Jure
+    family-names: Leskovec
+  journal: Bioinformatics
+  volume: 34
+  issue: 13
+  start: i457
+  end: i466
+  year: 2018
+  doi: 10.1093/bioinformatics/bty294

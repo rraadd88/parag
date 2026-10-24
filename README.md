@@ -351,6 +351,25 @@ cfg,df_=to_net(
 
 </div>
 
+## Data sources and acknowledgements
+
+The gene-interaction and drug side-effect examples use datasets from the
+[BioSNAP](https://snap.stanford.edu/biodata) collection. To keep the
+examples (and CI) fast and independent of network access, only the first
+1000 lines of each file are stored in
+[`examples/inputs`](https://github.com/rraadd88/parag/tree/master/examples/inputs);
+see the README there for details.
+
+| File | BioSNAP dataset | Source |
+|----|----|----|
+| `G-HumanEssential.tsv` | [Human essential genes](https://snap.stanford.edu/biodata/datasets/10033/10033-G-HumanEssential.html) | Gene essentiality from the studies listed in its `Data Source` column (PubMed IDs) |
+| `PPT-Ohmnet_tissues-combined.edgelist` | [Tissue-specific protein-protein interactions](https://snap.stanford.edu/biodata/datasets/10013/10013-PPT-Ohmnet.html) | Zitnik M, Leskovec J. Predicting multicellular function through multi-layer tissue networks. *Bioinformatics* 33(14), i190–i198 (2017) |
+| `ChSe-Decagon_monopharmacy.csv` | [Drug side effects](https://snap.stanford.edu/biodata/datasets/10018/10018-ChSe-Decagon.html) | Zitnik M, Agrawal M, Leskovec J. Modeling polypharmacy side effects with graph convolutional networks. *Bioinformatics* 34(13), i457–i466 (2018). [doi:10.1093/bioinformatics/bty294](https://doi.org/10.1093/bioinformatics/bty294) |
+
+Collection: Zitnik M, Sosič R, Maheshwari S, Leskovec J. BioSNAP
+Datasets: Stanford Biomedical Network Dataset Collection (2018).
+<https://snap.stanford.edu/biodata>
+
 ## How to cite?
 
 1.  Using BibTeX:  
