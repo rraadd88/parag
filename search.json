@@ -1,0 +1,142 @@
+[
+  {
+    "objectID": "04_io.html",
+    "href": "04_io.html",
+    "title": "Interchange",
+    "section": "",
+    "text": "Conversion to and from the Hypergraph Interchange Format (HIF)\nHIF is a JSON standard for exchanging higher-order networks between libraries e.g. XGI and HyperNetX (Coll et al., 2025, Network Science 13; arXiv:2507.11520). The JSON schema in parag/data/hif_schema.json is from the HIF-standard repository (MIT License).\nfrom parag.io import to_hif, from_hif, validate_hif, write_hif, read_hif",
+    "crumbs": [
+      "Interchange"
+    ]
+  },
+  {
+    "objectID": "04_io.html#examples",
+    "href": "04_io.html#examples",
+    "title": "Interchange",
+    "section": "Examples",
+    "text": "Examples\nRound trip of the network communities (undirected), in both modes, and reading by XGI.\n\nG = nx.karate_club_graph()\nnodes = (\n    pd.Series({i: list(t) for i, t in enumerate(list(nx.community.girvan_newman(G))[3])})\n    .explode()\n    .to_frame(\"node id\")\n    .reset_index()\n    .rename(columns={\"index\": \"community id\"})\n    .astype({\"node id\": int})\n    .loc[:, [\"node id\", \"community id\"]]\n)\nedges = pd.DataFrame(G.edges, columns=[\"source\", \"target\"])\nfor mode in [\"subsets\", \"pairwise\"]:\n    hif = to_hif(nodes, edges, \"node id\", \"source\", \"target\", \"community id\", mode=mode)\n    assert validate_hif(hif)\n    d = from_hif(json.loads(json.dumps(hif)))\n    pd.testing.assert_frame_equal(d[\"nodes\"], nodes, check_dtype=False)\n    pd.testing.assert_frame_equal(d[\"edges\"], edges, check_dtype=False)\n    H = xgi.convert.from_hif_dict(hif)\n    assert H.num_nodes == len(nodes)\n    assert H.num_edges == (nodes[\"community id\"].nunique() if mode == \"subsets\" else len(edges))\n\nDirected pairwise edges (drug → side effect), and writing/reading a HIF file.\n\nedges = pd.read_csv(\"inputs/ChSe-Decagon_monopharmacy.csv\")\nnodes = pd.concat(\n    [\n        edges.loc[:, [\"# STITCH\"]].drop_duplicates().rename(columns={\"# STITCH\": \"node id\"}).assign(subset=\"drug\"),\n        edges.loc[:, [\"Individual Side Effect\", \"Side Effect Name\"]]\n        .drop_duplicates(subset=[\"Individual Side Effect\"])\n        .rename(columns={\"Individual Side Effect\": \"node id\"})\n        .assign(subset=\"side effect\"),\n    ],\n    axis=0,\n    ignore_index=True,\n)\nhif = to_hif(nodes, edges, \"node id\", \"# STITCH\", \"Individual Side Effect\", \"subset\", mode=\"pairwise\", directed=True)\nwith tempfile.TemporaryDirectory() as dir_path:\n    d = from_hif(read_hif(write_hif(hif, f\"{dir_path}/drugs.json\")))\npd.testing.assert_frame_equal(d[\"nodes\"], nodes, check_dtype=False)\npd.testing.assert_frame_equal(d[\"edges\"], edges, check_dtype=False)\nassert type(xgi.convert.from_hif_dict(hif)).__name__ == \"DiHypergraph\"\n\nA HIF written by another library (XGI), with nodes in multiple hyperedges.\n\nhif = dict(xgi.convert.to_hif_dict(xgi.Hypergraph([[1, 2, 3], [3, 4], [4, 5, 6, 7]])))\ntry:\n    from_hif(hif)\n    raise AssertionError(\"expected a ValueError\")\nexcept ValueError:\n    pass\nd = from_hif(hif, subset_rule=\"largest\")\nassert d[\"nodes\"][\"subset\"].tolist() == [0, 0, 0, 2, 2, 2, 2]\nassert len(d[\"edges\"]) == 3 + 1 + 6  # g: clique expansion\nassert from_hif(hif, subset_rule=\"first\")[\"nodes\"][\"subset\"].tolist() == [0, 0, 0, 1, 2, 2, 2]\n\nInvalid HIF.\n\nassert not validate_hif({\"nodes\": []}, errors=\"warn\")",
+    "crumbs": [
+      "Interchange"
+    ]
+  },
+  {
+    "objectID": "02_graph.html",
+    "href": "02_graph.html",
+    "title": "(Pairwise) Graph",
+    "section": "",
+    "text": "For graph layoout related functions\n\n\nfrom parag.graph import center_subset_label, get_preprocessed, to_net\n\nDemo data\n\n## demo data\nfrom parag.core import get_net_data\nimport scanpy as sc\nnodes,edges=get_net_data(sc.datasets.pbmc68k_reduced())\n\n\nnodes.head(1)\n\n\nedges.head(1)\n\n\ncfg_base,nodes_=to_net(\n    nodes=nodes,\n    edges=edges,\n    col_node_id='cell id',\n    col_source='cell id1',\n    col_target='cell id2',\n    col_subset_id='bulk_labels',\n    defaults=dict(\n        radius=165,\n        textSize=8,\n        textOffset=7,\n    ),\n    # show_node_names=False,\n)\n\n\nnodes_.head()",
+    "crumbs": [
+      "(Pairwise) Graph"
+    ]
+  },
+  {
+    "objectID": "00_utils.html",
+    "href": "00_utils.html",
+    "title": "Utilities",
+    "section": "",
+    "text": "For basic functions\n\n\nfrom parag.utils import get_src_path, display_plot, export_plot, get_colors\n\n\nget_src_path(\n    'parag'\n    )\n\n\ndisplay_plot({\n  # \"$schema\": \"https://vega.github.io/schema/vega-lite/v5.json\",\n  \"description\": \"A simple bar chart with embedded data.\",\n  \"data\": {\n    \"values\": [\n      {\"a\": \"A\", \"b\": 28}, {\"a\": \"B\", \"b\": 55}, {\"a\": \"C\", \"b\": 43},\n      {\"a\": \"D\", \"b\": 91}, {\"a\": \"E\", \"b\": 81}, {\"a\": \"F\", \"b\": 53},\n      {\"a\": \"G\", \"b\": 19}, {\"a\": \"H\", \"b\": 87}, {\"a\": \"I\", \"b\": 52}\n    ]\n  },\n  \"mark\": \"bar\",\n  \"encoding\": {\n    \"x\": {\"field\": \"a\", \"type\": \"nominal\", \"axis\": {\"labelAngle\": 0}},\n    \"y\": {\"field\": \"b\", \"type\": \"quantitative\"}\n  }\n}\n)\n\n\nget_colors(\n    subsets=range(5),\n    cmap_subsets=None,\n    test=True,\n    )\n\n{0: '#0173b2', 1: '#de8f05', 2: '#029e73', 3: '#d55e00', 4: '#cc78bc'}",
+    "crumbs": [
+      "Utilities"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "parag",
+    "section": "",
+    "text": "Para (beyond pairwise) Graph: interactive visualization of higher-order graphs in Python",
+    "crumbs": [
+      "``parag``<a href=\"#\"><img src=\"https://openmoji.org/data/color/svg/1F386.svg\" align=\"right\" width=\"20%\"></a>"
+    ]
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "parag",
+    "section": "Install",
+    "text": "Install\npip install parag",
+    "crumbs": [
+      "``parag``<a href=\"#\"><img src=\"https://openmoji.org/data/color/svg/1F386.svg\" align=\"right\" width=\"20%\"></a>"
+    ]
+  },
+  {
+    "objectID": "index.html#interpretation-as-a-hypergraph-using-proportion-of-degrees-by-communities",
+    "href": "index.html#interpretation-as-a-hypergraph-using-proportion-of-degrees-by-communities",
+    "title": "parag",
+    "section": "Interpretation as a hypergraph, using proportion of degrees by communities",
+    "text": "Interpretation as a hypergraph, using proportion of degrees by communities\nProportion of degrees by communities in a pairwise graph helps reveal how nodes are grouped together and connected within different communities. This analysis highlights clusters of nodes with strong internal connections, potentially representing higher-order relationships. By comparing the degree proportions within and between communities, we can distinguish internal cohesion from inter-community interactions. These insights aid in interpreting the graph as a hypergraph, where communities with high intra-community connections may signify higher-order relationships, offering a richer understanding of complex interactions beyond simple pairwise connections.\nInspired by\n\nVehlow, Corinna, Thomas Reinhardt, and Daniel Weiskopf. “Visualizing fuzzy overlapping communities in networks.” IEEE Transactions on Visualization and Computer Graphics 19.12 (2013): 2486-2495.\nFigure 9B\n\nExamples:\n\nGene interaction networks\n\nfrom parag.hypergraph import to_net\ncfg,df_=to_net(\n    nodes=nodes.sort_values('Essentiality (determined from multiple datasets)'),\n    edges=edges,\n    col_node_id='Gene ID',\n    col_source='# protein1',\n    col_target='protein2',\n    col_subset_id='Essentiality (determined from multiple datasets)',\n    show_node_names=True,\n    defaults=dict(\n        radius=250,\n        innerRadius=280,\n        outerRadius=295,\n        textSize=7,\n        textOffset=3,\n    ),\n)\n\n\n\n\n        \n        \n\n\n\n\n\n\n\n\n\n\n\n\n\nNeighbourhood analysis in latent space e.g. single cell data\n\nsc.pl.umap(adata, color=\"bulk_labels\",title='Latent space')\n\n\n\n\n\n\n\n\n\nfrom parag.core import get_net_data\nnodes,edges=get_net_data(adata) ## generated network data by measuring distances in the latent space and thresholding\n\n\nfrom parag.hypergraph import to_net\ncfg,df_=to_net(\n    nodes,\n    edges,\n    col_node_id='cell id',\n    col_source='cell id1',\n    col_target='cell id2',\n    col_subset_id='bulk_labels',\n    show_node_names=False,\n    defaults=dict(\n            textSize=8,\n            textOffset=3,\n    ),\n)\n\n\n\n\n        \n        \n\n\n\n\n\n\n\n\n\n\n\n\n\nHeterogeneous graph e.g. drug side-effects network\n\n## filter\nnodes=(df02\n    .loc[:,[\"Individual Side Effect\",\"Side Effect Name\"]]\n    .log.drop_duplicates()\n    .assign(\n         #Side Effect type\n          subset=lambda df: df['Side Effect Name'].str.split(' ',expand=True)[0],  \n    )\n    .drop(['Side Effect Name'],axis=1)\n    .groupby('subset').filter(lambda df: len(df)&gt;3 and len(df)&lt;10)\n    .head(5)\n    .sort_values('subset')\n    .log('Individual Side Effect') # id\n    .log('Individual Side Effect') # name\n    )\nnodes.head(1)\n\n\n\n\n\n\n\n\nIndividual Side Effect\nsubset\n\n\n\n\n1\nC0162830\nPhotosensitivity\n\n\n\n\n\n\n\n\nedges=(\n    df02\n    .log.query(expr=f\"`Individual Side Effect` == {nodes['Individual Side Effect'].unique().tolist()}\")\n    )\nedges.head(1)\n\n\n\n\n\n\n\n\n# STITCH\nIndividual Side Effect\nSide Effect Name\n\n\n\n\n1\nCID003062316\nC0162830\nPhotosensitivity reaction\n\n\n\n\n\n\n\n\n## append drugs to nodes\nnodes=pd.concat(\n    [\n        edges.loc[:,['# STITCH']].drop_duplicates().rename(columns={'# STITCH':'node id'},errors='raise').assign(subset='drug'),\n        nodes.rename(columns={'Individual Side Effect':'node id'},errors='raise'),\n    ],\n    axis=0,\n    )\nnodes.head(1)\n\n\n\n\n\n\n\n\nnode id\nsubset\n\n\n\n\n1\nCID003062316\ndrug\n\n\n\n\n\n\n\n\nfrom parag.hypergraph import to_net\ncfg,df_=to_net(\n    nodes,\n    edges,\n    col_node_id='node id',\n    col_source='# STITCH',\n    col_target='Individual Side Effect',\n    col_subset_id='subset',\n    show_node_names=False,\n    defaults=dict(\n        radius=200,\n        innerRadius=205,\n        outerRadius=235,\n        textSize=9,\n        textOffset=3,\n        cornerRadius=3.5,\n    ),\n)\n\n\n\n\n        \n        \n\n\n\n\n\n\n\n\n\n\n\n\n\nNetwork communities\n\n# Plot graph with colouring based on communities\nfig, ax = plt.subplots(1,1, figsize=(5, 3))\nvisualize_communities(G, communities[3], 2)\n\n\n\n\n\n\n\n\n\nnodes=pd.Series({i:list(t) for i,t in enumerate(communities[3])}).explode().to_frame('node id').reset_index().rename(columns={'index':'community id'}).sort_values('community id')\nnodes.head(1)\n\n\n\n\n\n\n\n\ncommunity id\nnode id\n\n\n\n\n0\n0\n0\n\n\n\n\n\n\n\n\nedges=pd.DataFrame(G.edges,columns=['source','target'])\nedges.head(1)\n\n\n\n\n\n\n\n\nsource\ntarget\n\n\n\n\n0\n0\n1\n\n\n\n\n\n\n\n\nfrom parag.hypergraph import to_net\ncfg,df_=to_net(\n    nodes.applymap(str),\n    edges.applymap(str),\n    col_node_id='node id',\n    col_source='source',\n    col_target='target',\n    col_subset_id='community id',\n    show_node_names=True,\n    defaults=dict(\n        radius=180,\n        innerRadius=205,\n        outerRadius=235,\n        textSize=17,\n        textOffset=4,\n        cornerRadius=3.5,\n    ),\n)\n\n\n\n\n        \n        \n\n\n\n\n\n\n\n\n\n\n\n\n\nInteroperability with other hypergraph libraries\nNodes and edges can be converted to and from the Hypergraph Interchange Format (HIF), e.g. to exchange data with XGI or HyperNetX. With mode='subsets' (default), the subsets (e.g. communities) are the hyperedges; with mode='pairwise', each edge is a hyperedge of 2 nodes.\n\nfrom parag.io import to_hif, from_hif\nhif = to_hif(\n    nodes,\n    edges,\n    col_node_id='node id',\n    col_source='source',\n    col_target='target',\n    col_subset_id='community id',\n)\n## e.g. write_hif(hif, 'communities.json'), xgi.read_hif('communities.json')\n## from HIF, e.g. from_hif(read_hif('communities.json')), input for to_net\nd = from_hif(hif)\nd['nodes'].head(2)",
+    "crumbs": [
+      "``parag``<a href=\"#\"><img src=\"https://openmoji.org/data/color/svg/1F386.svg\" align=\"right\" width=\"20%\"></a>"
+    ]
+  },
+  {
+    "objectID": "index.html#data-sources-and-acknowledgements",
+    "href": "index.html#data-sources-and-acknowledgements",
+    "title": "parag",
+    "section": "Data sources and acknowledgements",
+    "text": "Data sources and acknowledgements\nThe gene-interaction and drug side-effect examples use datasets from the BioSNAP collection. To keep the examples (and CI) fast and independent of network access, only the first 1000 lines of each file are stored in examples/inputs; see the README there for details.\n\n\n\nFile\nBioSNAP dataset\nSource\n\n\n\n\nG-HumanEssential.tsv\nHuman essential genes\nGene essentiality from the studies listed in its Data Source column (PubMed IDs)\n\n\nPPT-Ohmnet_tissues-combined.edgelist\nTissue-specific protein-protein interactions\nZitnik M, Leskovec J. Predicting multicellular function through multi-layer tissue networks. Bioinformatics 33(14), i190–i198 (2017)\n\n\nChSe-Decagon_monopharmacy.csv\nDrug side effects\nZitnik M, Agrawal M, Leskovec J. Modeling polypharmacy side effects with graph convolutional networks. Bioinformatics 34(13), i457–i466 (2018). doi:10.1093/bioinformatics/bty294\n\n\n\nCollection: Zitnik M, Sosič R, Maheshwari S, Leskovec J. BioSNAP Datasets: Stanford Biomedical Network Dataset Collection (2018). https://snap.stanford.edu/biodata",
+    "crumbs": [
+      "``parag``<a href=\"#\"><img src=\"https://openmoji.org/data/color/svg/1F386.svg\" align=\"right\" width=\"20%\"></a>"
+    ]
+  },
+  {
+    "objectID": "index.html#how-to-cite",
+    "href": "index.html#how-to-cite",
+    "title": "parag",
+    "section": "How to cite?",
+    "text": "How to cite?\n\nUsing BibTeX:\n\n\n@software{Dandage_parag,\n  title   = {parag: interactive visualization of higher-order graphs in Python},\n  author  = {Dandage, Rohan},\n  year    = {2024},\n  url     = {https://doi.org/10.5281/zenodo.10703097},\n  version = {v0.0.1},\n  note    = {The URL is a DOI link to the permanent archive of the software.},\n}\n\nDOI link: , or\nUsing citation information from CITATION.CFF file.",
+    "crumbs": [
+      "``parag``<a href=\"#\"><img src=\"https://openmoji.org/data/color/svg/1F386.svg\" align=\"right\" width=\"20%\"></a>"
+    ]
+  },
+  {
+    "objectID": "index.html#future-directions-for-which-contributions-are-welcome",
+    "href": "index.html#future-directions-for-which-contributions-are-welcome",
+    "title": "parag",
+    "section": "Future directions, for which contributions are welcome",
+    "text": "Future directions, for which contributions are welcome\n\nShowing degree counts in addition to the percentages\n\nInferring the defaults e.g. radii from the input data.\nBind rotate signal to the hypergraph and start/endAngle to graph.\n\nSet up tidy layout.\nEdge coloring by source and target nodes and setting interactions.\nCI for quicker testing use lighter example.\nMore examples",
+    "crumbs": [
+      "``parag``<a href=\"#\"><img src=\"https://openmoji.org/data/color/svg/1F386.svg\" align=\"right\" width=\"20%\"></a>"
+    ]
+  },
+  {
+    "objectID": "01_data.html",
+    "href": "01_data.html",
+    "title": "Data",
+    "section": "",
+    "text": "For data management\n\n\nfrom parag.core import get_net_data\n\n\n## demo data\nimport scanpy as sc\nnodes,edges=get_net_data(sc.datasets.pbmc68k_reduced())\n\n\nnodes.head(1)\n\n\n\n\n\n\n\n\ncell id\nbulk_labels\nn_genes\npercent_mito\nn_counts\nS_score\nG2M_score\nphase\nlouvain\nx\ny\n\n\n\n\n0\nCAGACAACAAAACG-7\nCD4+/CD25 T Reg\n1109\n0.012702\n3779.0\n-0.054589\n-1.267457\nG1\n0\n-7.174749\n-6.994063\n\n\n\n\n\n\n\n\nedges.head(1)\n\n\n\n\n\n\n\n\ncell id1\ncell id2\ndistance\n\n\n\n\n0\nCAGACAACAAAACG-7\nGTGATGACTGGGAG-4\n1.298669",
+    "crumbs": [
+      "Data"
+    ]
+  },
+  {
+    "objectID": "03_hypergraph.html",
+    "href": "03_hypergraph.html",
+    "title": "Hypergraphs",
+    "section": "",
+    "text": "For hypergrapph related functions\nfrom parag.hypergraph import get_degreeby_subset, plot_degreeby_subset, to_net\nDemo data\nfrom parag.core import get_net_data\nimport scanpy as sc\nnodes,edges=get_net_data(sc.datasets.pbmc68k_reduced())\nnodes.head(1)\n\n\n\n\n\n\n\n\ncell id\nbulk_labels\nn_genes\npercent_mito\nn_counts\nS_score\nG2M_score\nphase\nlouvain\nx\ny\n\n\n\n\n0\nCAGACAACAAAACG-7\nCD4+/CD25 T Reg\n1109\n0.012702\n3779.0\n-0.054589\n-1.267457\nG1\n0\n-7.174749\n-6.994063\nedges.head(1)\n\n\n\n\n\n\n\n\ncell id1\ncell id2\ndistance\n\n\n\n\n0\nCAGACAACAAAACG-7\nGTGATGACTGGGAG-4\n1.298669",
+    "crumbs": [
+      "Hypergraphs"
+    ]
+  },
+  {
+    "objectID": "03_hypergraph.html#degrees-by-subsets",
+    "href": "03_hypergraph.html#degrees-by-subsets",
+    "title": "Hypergraphs",
+    "section": "Degrees by subsets",
+    "text": "Degrees by subsets\n\ncfg_bars=plot_degreeby_subset(\n    nodes.sort_values('bulk_labels',ascending=True),\n    edges,\n    col_node_id='cell id',\n    col_source='cell id1',\n    col_target='cell id2',\n    col_subset_id='bulk_labels',    \n    config_base_path=None,\n    cmap_subsets=None,  \n    # defaults=dict(\n    #     innerRadius=170,\n    #     outerRadius=200,\n    #     innerPadding=0.15,\n    # ),\n    )",
+    "crumbs": [
+      "Hypergraphs"
+    ]
+  },
+  {
+    "objectID": "03_hypergraph.html#integrate-with-graph",
+    "href": "03_hypergraph.html#integrate-with-graph",
+    "title": "Hypergraphs",
+    "section": "Integrate with graph",
+    "text": "Integrate with graph\n\ncfg,df_=to_net(\n    nodes,\n    edges,\n    col_node_id='cell id',\n    col_source='cell id1',\n    col_target='cell id2',\n    col_subset_id='bulk_labels',\n    show_node_names=False,\n    defaults=dict(\n            textSize=8,\n            textOffset=3,\n    ),\n)",
+    "crumbs": [
+      "Hypergraphs"
+    ]
+  }
+]
