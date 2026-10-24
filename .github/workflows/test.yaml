@@ -5,25 +5,26 @@ permissions:
   contents: read
 
 jobs:
-  # g: report-only; auto-fixing/formatting the nbdev-generated parag/*.py desyncs them from the notebooks (fails `test`)
   ruff:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: ruff
-        continue-on-error: true
-        run: |
-          pip install --user ruff
-          ruff check parag
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
 
-  # g: inlined from fastai/workflows/nbdev-ci@master, using uv and pinning the nbdev 2 stack
-  # (execnb>=0.2 removed execnb.nbio and fastcore>=2 removed Param; both break nbdev<3)
+      # g: blocking; rules are set in pyproject.toml ([tool.ruff.lint])
+      - name: ruff
+        run: uvx ruff@0.17.2 check parag tests
+
   test:
     runs-on: ubuntu-latest
-    env:
-      NBDEV_PINS: "nbdev<3 execnb<0.2 fastcore<2"
+    # g: the current and a newer stable Python
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.14"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -31,39 +32,12 @@ jobs:
       - name: Set up uv
         uses: astral-sh/setup-uv@v6
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
           activate-environment: true
 
       - name: Install
-        run: uv pip install $NBDEV_PINS -e ".[dev]"
+        run: uv pip install -e ".[dev]"
 
-      - name: Check we are starting with clean git checkout
-        run: |
-          if [[ `git status --porcelain -uno` ]]; then
-            git diff
-            echo "git status is not clean"
-            false
-          fi
-
-      - name: Check notebooks are stripped
-        run: |
-          nbdev_clean
-          git status -s
-          if [[ `git status --porcelain -uno` ]]; then
-            git status -uno
-            echo -e "!!! Detected unstripped out notebooks\n!!!Remember to run nbdev_clean"
-            false
-          fi
-
-      - name: Check notebooks and library are in sync
-        run: |
-          nbdev_export
-          if [[ `git status --porcelain -uno` ]]; then
-            echo "::error::Notebooks and library are not in sync.  Please run nbdev_export."
-            git status -uno
-            git diff
-            exit 1
-          fi
-
-      - name: Test notebooks
-        run: nbdev_test
+      # g: unit tests and the tutorial notebooks (tests/test_notebooks.py)
+      - name: Test
+        run: pytest

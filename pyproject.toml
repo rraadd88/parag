@@ -1,11 +1,54 @@
 [build-system]
-requires = ["setuptools>=64.0"]
+requires = ["setuptools>=77.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name="parag"
-requires-python=">=3.7"
-dynamic = [ "keywords", "description", "version", "dependencies", "optional-dependencies", "readme", "license", "authors", "classifiers", "entry-points", "scripts", "urls"]
+name = "parag"
+dynamic = ["version"]
+description = "parag: Interactive visualization of higher-order graphs in Python"
+readme = "README.md"
+requires-python = ">=3.7"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+authors = [{ name = "Rohan Dandage", email = "rohanadanadge@gmail.com" }]
+keywords = ["hypergraph", "network", "visualization", "vega"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+]
+# g: everything parag imports directly (not only via roux)
+dependencies = [
+    "roux",
+    "networkx",
+    "vl-convert-python",
+    "pandas",
+    "ipython",
+    "seaborn",
+    "scipy",
+    "jsonschema",
+]
 
-[tool.uv]
-cache-keys = [{ file = "pyproject.toml" }, { file = "settings.ini" }, { file = "setup.py" }]
+[project.optional-dependencies]
+dev = ["scanpy", "xgi", "pytest", "nbclient", "ipykernel"]
+
+[project.urls]
+Homepage = "https://github.com/rraadd88/parag"
+Documentation = "https://rraadd88.github.io/parag"
+Issues = "https://github.com/rraadd88/parag/issues"
+
+[tool.setuptools]
+packages = ["parag", "parag.data"]
+
+[tool.setuptools.dynamic]
+version = { attr = "parag.__version__" }
+
+[tool.setuptools.package-data]
+"parag.data" = ["*.json", "*.LICENSE"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

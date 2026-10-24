@@ -14,7 +14,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.7
+          # g: setuptools>=77 (pyproject.toml) requires Python>=3.9
+          python-version: "3.12"
       - name: Install pypa/build
         run: >-
           python -m
