@@ -7,44 +7,30 @@ permissions:
 on:
   push:
     branches: [ "main", "master" ]
-    
+
 jobs:
   deploy:
       runs-on: ubuntu-latest
+      # g: same uv setup and nbdev 2 pins as the `test` job in test.yaml (`inputs.*` were undefined on push)
+      env:
+        NBDEV_PINS: "nbdev<3 execnb<0.2 fastcore<2"
       steps:
-        - uses: actions/checkout@v3
-        - uses: actions/setup-python@v4
+        - uses: actions/checkout@v4
+        - name: Set up uv
+          uses: astral-sh/setup-uv@v6
           with:
-            python-version: ${{ inputs.version }}
-            cache: "pip"
-            cache-dependency-path: settings.ini
+            python-version: "3.12"
+            activate-environment: true
+        - name: Set up Quarto
+          uses: quarto-dev/quarto-actions/setup@v2
         - name: Install Dependencies
-          env:
-            USE_PRE: ${{ inputs.pre }}
-            TORCH_CPU: "${{ inputs.torch_cpu }}"
-          shell: bash
+          run: uv pip install $NBDEV_PINS -e ".[dev]"
+        - name: Build docs
           run: |
-            set -ux
-            python -m pip install --upgrade pip
-            if [ $USE_PRE ]; then
-              pip install -Uq git+https://github.com/fastai/ghapi.git
-              pip install -Uq git+https://github.com/fastai/fastcore.git
-              pip install -Uq git+https://github.com/fastai/execnb.git
-              pip install -Uq git+https://github.com/fastai/nbdev.git
-              wget -q $(curl https://latest.fast.ai/pre/quarto-dev/quarto-cli/linux-amd64.deb)
-              sudo dpkg -i quarto*.deb
-            else
-              pip install -Uq nbdev
-            fi
-            if [ $TORCH_CPU ]; then
-              test -f setup.py && pip install -e ".[dev]" --extra-index-url https://download.pytorch.org/whl/cpu
-            else
-              test -f setup.py && pip install -e ".[dev]"
-            fi
             nbdev_docs
             cp -r examples/outputs _docs
         - name: Deploy to GitHub Pages
-          uses: peaceiris/actions-gh-pages@v3
+          uses: peaceiris/actions-gh-pages@v4
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
             force_orphan: true
