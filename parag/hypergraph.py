@@ -232,7 +232,8 @@ def to_net(
     ## removal of unsupported signals
     for i,d in enumerate(cfg_hyg['signals']):
         if d['name'] in ['rotate','startAngle','endAngle','extent',"layout"]:
-            del cfg_hyg['signals'][i]['bind']
+            # g: pop instead of del; avoids KeyError for signals without 'bind'
+            cfg_hyg['signals'][i].pop('bind', None)
     
     ## aes
     if not show_node_names:
@@ -247,7 +248,8 @@ def to_net(
             cfg_hyg.copy(),
             defaults=defaults,
         )
-    except DisplayError:
-        logging.error("plot not displayed, check the config.")
+    # g: DisplayError was undefined (NameError); catch and log the actual error instead
+    except Exception as e:
+        logging.error(f"plot not displayed ({e!r}), check the config.")
     return cfg_hyg, degreebysubset
 
