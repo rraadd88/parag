@@ -351,6 +351,31 @@ cfg,df_=to_net(
 
 </div>
 
+### Interoperability with other hypergraph libraries
+
+Nodes and edges can be converted to and from the [Hypergraph Interchange
+Format (HIF)](https://github.com/pszufe/HIF-standard), e.g. to exchange
+data with [XGI](https://github.com/xgi-org/xgi) or
+[HyperNetX](https://github.com/pnnl/HyperNetX). With `mode='subsets'`
+(default), the subsets (e.g. communities) are the hyperedges; with
+`mode='pairwise'`, each edge is a hyperedge of 2 nodes.
+
+``` python
+from parag.io import to_hif, from_hif
+hif = to_hif(
+    nodes,
+    edges,
+    col_node_id='node id',
+    col_source='source',
+    col_target='target',
+    col_subset_id='community id',
+)
+## e.g. write_hif(hif, 'communities.json'), xgi.read_hif('communities.json')
+## from HIF, e.g. from_hif(read_hif('communities.json')), input for to_net
+d = from_hif(hif)
+d['nodes'].head(2)
+```
+
 ## Data sources and acknowledgements
 
 The gene-interaction and drug side-effect examples use datasets from the
