@@ -1,7 +1,7 @@
-from pkg_resources import parse_version
+# g: pkg_resources was removed from setuptools (>=81); compare (major, minor) directly
 from configparser import ConfigParser
 import setuptools, shlex
-assert parse_version(setuptools.__version__)>=parse_version('36.2')
+assert tuple(int(p) for p in setuptools.__version__.split('.')[:2])>=(36, 2)
 
 # note: all settings are in settings.ini; edit there, not here
 config = ConfigParser(delimiters=['='])
