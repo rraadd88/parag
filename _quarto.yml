@@ -1,8 +1,14 @@
-# ipynb-filters: [nbdev_filter]
-
 project:
   type: website
   output-dir: _docs
+  # g: the notebooks are rendered with their saved outputs (not executed)
+  render:
+    - index.ipynb
+    - 00_utils.ipynb
+    - 01_data.ipynb
+    - 02_graph.ipynb
+    - 03_hypergraph.ipynb
+    - 04_io.ipynb
   preview:
     port: 3000
     browser: false
@@ -31,7 +37,10 @@ website:
         href: "https://github.com/rraadd88/parag"
   sidebar:
     style: "floating"
-
-metadata-files: 
-  - sidebar.yml
-  - custom.yml
+    contents:
+      - index.ipynb
+      - 00_utils.ipynb
+      - 01_data.ipynb
+      - 02_graph.ipynb
+      - 03_hypergraph.ipynb
+      - 04_io.ipynb

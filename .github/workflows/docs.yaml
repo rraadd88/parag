@@ -7,13 +7,10 @@ permissions:
 on:
   push:
     branches: [ "main", "master" ]
-
+    
 jobs:
   deploy:
       runs-on: ubuntu-latest
-      # g: same uv setup and nbdev 2 pins as the `test` job in test.yaml (`inputs.*` were undefined on push)
-      env:
-        NBDEV_PINS: "nbdev<3 execnb<0.2 fastcore<2"
       steps:
         - uses: actions/checkout@v4
         - name: Set up uv
@@ -24,10 +21,11 @@ jobs:
         - name: Set up Quarto
           uses: quarto-dev/quarto-actions/setup@v2
         - name: Install Dependencies
-          run: uv pip install $NBDEV_PINS -e ".[dev]"
+          run: uv pip install -e ".[dev]"
+        # g: notebooks are rendered with their saved outputs (see _quarto.yml)
         - name: Build docs
           run: |
-            nbdev_docs
+            quarto render
             cp -r examples/outputs _docs
         - name: Deploy to GitHub Pages
           uses: peaceiris/actions-gh-pages@v4

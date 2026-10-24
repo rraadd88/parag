@@ -1,8 +1,0 @@
-include settings.ini
-include LICENSE
-include CONTRIBUTING.md
-include README.md
-recursive-exclude * __pycache__
-include parag/data/*.json
-include parag/data/*.LICENSE
-include parag/*.json

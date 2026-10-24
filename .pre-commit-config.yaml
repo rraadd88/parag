@@ -1,6 +1,7 @@
 repos:
-- repo: https://github.com/fastai/nbdev
-  rev: 2.2.10
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.6.9
   hooks:
-  - id: nbdev_clean
-  - id: nbdev_export
+  - id: ruff
+    args: [parag, tests]
+    pass_filenames: false
