@@ -1,4 +1,4 @@
-"""Run the tutorial notebooks, in a temporary directory with a copy of the example inputs (their paths are relative to the repository root)."""
+"""Run the tutorial notebooks (examples/*.ipynb), in a temporary directory with a copy of the example inputs (their paths are relative to examples/)."""
 
 import shutil
 
@@ -9,10 +9,10 @@ from nbclient import NotebookClient
 from conftest import ROOT_DIR_PATH
 
 
-@pytest.mark.parametrize("nb_path", sorted(ROOT_DIR_PATH.glob("*.ipynb")), ids=lambda p: p.name)
+@pytest.mark.parametrize("nb_path", sorted((ROOT_DIR_PATH / "examples").glob("*.ipynb")), ids=lambda p: p.name)
 def test_notebook(nb_path, tmp_path):
-    ## outputs (e.g. examples/outputs) are written in tmp_path, not in the repository
-    shutil.copytree(ROOT_DIR_PATH / "examples" / "inputs", tmp_path / "examples" / "inputs")
+    ## outputs (e.g. outputs/*.html) are written in tmp_path, not in the repository
+    shutil.copytree(ROOT_DIR_PATH / "examples" / "inputs", tmp_path / "inputs")
     nb = nbformat.read(nb_path, as_version=4)
     NotebookClient(
         nb,

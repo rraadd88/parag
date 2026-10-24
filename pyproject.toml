@@ -18,10 +18,20 @@ classifiers = [
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
 ]
-dependencies = ["roux", "networkx", "vl-convert-python"]
+# g: everything parag imports directly (not only via roux)
+dependencies = [
+    "roux",
+    "networkx",
+    "vl-convert-python",
+    "pandas",
+    "ipython",
+    "seaborn",
+    "scipy",
+    "jsonschema",
+]
 
 [project.optional-dependencies]
-dev = ["scanpy", "xgi", "jsonschema", "pytest", "nbclient", "ipykernel"]
+dev = ["scanpy", "xgi", "pytest", "nbclient", "ipykernel"]
 
 [project.urls]
 Homepage = "https://github.com/rraadd88/parag"

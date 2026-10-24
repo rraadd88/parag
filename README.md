@@ -85,7 +85,7 @@ cfg,df_=to_net(
 sc.pl.umap(adata, color="bulk_labels",title='Latent space')
 ```
 
-![](index_files/figure-commonmark/cell-5-output-1.png)
+![](examples/images/cell-5-output-1.png)
 
 ``` python
 from parag.core import get_net_data
@@ -264,7 +264,7 @@ fig, ax = plt.subplots(1,1, figsize=(5, 3))
 visualize_communities(G, communities[3], 2)
 ```
 
-![](index_files/figure-commonmark/cell-16-output-1.png)
+![](examples/images/cell-16-output-1.png)
 
 ``` python
 nodes=pd.Series({i:list(t) for i,t in enumerate(communities[3])}).explode().to_frame('node id').reset_index().rename(columns={'index':'community id'}).sort_values('community id')
@@ -417,15 +417,24 @@ Datasets: Stanford Biomedical Network Dataset Collection (2018).
 
 ## Development
 
-The package source is in `parag/`; the notebooks (`index.ipynb`,
-`0*_*.ipynb`) are tutorials that import from it.
+The package source is in `parag/`. The tutorials (`examples/*.ipynb`)
+import from it; `examples/` also holds the docs configuration, their
+inputs and outputs.
 
 ``` sh
 uv pip install -e ".[dev]"
 pytest                      # unit tests (tests/) and the tutorial notebooks
 uvx ruff@0.17.2 check parag tests
-quarto render               # docs, into _docs/
+quarto render examples      # docs, into _docs/
 ```
+
+### Release checklist
+
+1.  Bump the version in `parag/__init__.py` (`__version__`).
+2.  Update `version` and `date-released` in `CITATION.cff` (checked by
+    `tests/test_metadata.py`).
+3.  Push a tag (e.g. `git tag v0.0.2 && git push --tags`); the `release`
+    workflow publishes to PyPI.
 
 ## Future directions, for which contributions are welcome
 

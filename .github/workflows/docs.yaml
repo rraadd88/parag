@@ -22,11 +22,9 @@ jobs:
           uses: quarto-dev/quarto-actions/setup@v2
         - name: Install Dependencies
           run: uv pip install -e ".[dev]"
-        # g: notebooks are rendered with their saved outputs (see _quarto.yml)
+        # g: notebooks are rendered with their saved outputs (see examples/_quarto.yml)
         - name: Build docs
-          run: |
-            quarto render
-            cp -r examples/outputs _docs
+          run: quarto render examples
         - name: Deploy to GitHub Pages
           uses: peaceiris/actions-gh-pages@v4
           with:
